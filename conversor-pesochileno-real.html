@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor Peso Chileno para Real</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #e86850; /* Vermelho claro */
+        }
+        .container {
+            text-align: center;
+            padding: 50px;
+            background-color: #FFFFFF; /* Branco */
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 600px; /* Aumento da largura */
+        }
+        input[type="text"] {
+            padding: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid #FF6666; /* Vermelho mais escuro */
+            border-radius: 8px;
+            font-size: 16px; /* Aumento do tamanho da fonte */
+            color: #000000; /* Preto */
+        }
+        button {
+            padding: 12px 24px;
+            background-color: #FF6666; /* Vermelho mais escuro */
+            color: #000000; /* Preto */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 16px; /* Aumento do tamanho da fonte */
+            display: block;
+            margin: 0 auto; /* Centraliza horizontalmente */
+        }
+        button:disabled {
+            background-color: #CCCCCC; /* Cinza claro */
+            cursor: not-allowed;
+        }
+        p {
+            color: #000000; /* Preto */
+            font-size: 14px; /* Aumento do tamanho da fonte */
+            margin-right: 10px;
+            margin-left: 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        #resultado {
+            font-size: 40px; /* Aumento do tamanho da fonte para o resultado */
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            cursor: pointer; /* Torna o valor clicável */
+        }
+        #resultado:hover {
+            text-decoration: underline; /* Adiciona sublinhado ao passar o mouse */
+            text-decoration-color: black; /* Define a cor da linha sublinhada */
+        }
+        h2 {
+            font-size: 20px; /* Aumento do tamanho da fonte para o título */
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .copy-info {
+            font-size: 12px;
+            color: #666666; /* Cinza */
+            display: none; /* Inicialmente oculto */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>CLP - R$</h2>
+        <p>Cotação: CLP 155</p>
+        <input type="text" id="valorPesos" placeholder="CLP 0" maxlength="20" style="width: 200px" oninput="validarValor()" onkeydown="if(event.keyCode==13) converter()">
+        <button onclick="converter()">Converter</button>
+        <p id="resultado" onclick="copiarValor()"></p> <!-- Adicionado o evento de clique diretamente ao valor convertido -->
+        <p class="copy-info">Clique no valor para copiá-lo para a área de transferência e depois colar diretamente no receptivo (Reservame).</p>
+        <br>
+        <button id="novaConversao" style="display: none;" onclick="novaConversao()">Nova Conversão</button>
+    </div>
+
+    <script>
+        function validarValor() {
+            var valor = document.getElementById("valorPesos").value;
+            // Remove todos os caracteres que não são números
+            valor = valor.replace(/[^\d]/g, '');
+            // Atualiza o valor do campo de entrada
+            document.getElementById("valorPesos").value = valor;
+        }
+
+        function converter() {
+            var valorInput = document.getElementById("valorPesos").value.trim();
+            if (valorInput === "") {
+                alert("Por favor, insira um valor antes de converter.");
+                return;
+            }
+
+            var valorPesos = parseFloat(valorInput.replace("CLP ", "").replace(",", "."));
+            var cotacaowlc = 155;
+            var valorConvertido = valorPesos / cotacaowlc;
+
+            // Arredonda o valor para duas casas decimais
+            valorConvertido = valorConvertido.toFixed(2);
+            valorConvertido = valorConvertido.replace(".", ",");
+
+            // Atualiza o resultado com a formatação desejada
+            document.getElementById("resultado").innerHTML = '<span style="color: black;">R$ </span><span style="color: #008000;">' + valorConvertido + '</span>';
+            document.querySelector(".copy-info").style.display = "block"; // Exibe o texto de informação
+            document.getElementById("novaConversao").style.display = "block";
+            document.getElementById("valorPesos").disabled = true;
+            document.querySelector("button").disabled = true;
+        }
+
+        function copiarValor() {
+            var resultado = document.getElementById("resultado").textContent.replace(/[^\d.,]/g, ''); // Apenas números, vírgulas e pontos
+            var tempInput = document.createElement("input");
+            tempInput.value = resultado;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+        }
+
+        function novaConversao() {
+            document.getElementById("valorPesos").value = "";
+            document.getElementById("resultado").textContent = "";
+            document.querySelector(".copy-info").style.display = "none"; // Oculta o texto de informação
+            document.getElementById("novaConversao").style.display = "none";
+            document.getElementById("valorPesos").disabled = false;
+            document.querySelector("button").disabled = false;
+        }
+    </script>
+</body>
+</html>

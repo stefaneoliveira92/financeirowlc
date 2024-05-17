@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora pagamento Mercado Pago</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #e86850;
+        }
+        .container {
+            text-align: center;
+            padding: 50px;
+            background-color: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 600px;
+        }
+        input[type="number"], input[type="text"] {
+            padding: 10px;
+            margin-bottom: 20px;
+            width: calc(100% - 22px);
+            text-align: center;
+            border: 1px solid #FF6666;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #000000;
+        }
+        button {
+            padding: 12px 24px;
+            background-color: #FF6666;
+            color: #000000;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 16px;
+            display: block;
+            margin: 0 auto;
+        }
+        button:disabled {
+            background-color: #CCCCCC;
+            cursor: not-allowed;
+            margin-bottom: 30px;
+        }
+        #calcular {
+            margin-bottom: 10px;
+        }
+        #novaCalculoBtn {
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #000000;
+            font-size: 14px;
+            margin: 10px;
+        }
+        #resultado {
+            font-size: 40px;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        #resultado:hover {
+            text-decoration: underline;
+            text-decoration-color: black;
+        }
+        h2 {
+            font-size: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .copy-info {
+            font-size: 12px;
+            color: #666666;
+            display: none;
+        }
+        #textoResultado {
+            font-size: 14px;
+            color: #666666;
+            display: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Pagamento Mercado Pago</h2>
+        <input type="text" id="valorPago" placeholder="Total pago (R$ 0,00)" maxlength="20" style="width: 200px" oninput="validarValor()">
+        <input type="number" id="numeroParcelas" placeholder="Nº de parcelas (1-12)" min="1" max="12" style="width: 200px" inputmode="numeric" oninput="validarNumeroParcelas()">
+        <button onclick="calcular()" id="calcularBtn">Calcular</button>
+        <p id="textoResultado" style="display: none;"></p>
+        <p id="resultado" onclick="copiarValor()" style="cursor: pointer;"></p>
+        <p class="copy-info" id="copyInfo" style="display: none;">Clique no valor para copiá-lo para a área de transferência e depois colar diretamente no receptivo (Reservame).</p>
+        <button onclick="novaConversao()" id="novaCalculoBtn" style="display: none;">Novo Cálculo</button>
+    </div>
+
+    <script>
+        function validarValor() {
+            var inputElement = document.getElementById("valorPago");
+            var valor = inputElement.value;
+
+            valor = valor.replace(/[^0-9,.]/g, '');
+            valor = valor.replace(',', '.');
+
+            var partes = valor.split('.');
+            if (partes.length > 2) {
+                partes = [partes[0], partes.slice(1).join('')];
+            }
+            if (partes[1] && partes[1].length > 2) {
+                partes[1] = partes[1].substring(0, 2);
+            }
+            valor = partes.join('.');
+
+            inputElement.value = valor;
+        }
+
+        function validarNumeroParcelas() {
+            var numeroParcelas = document.getElementById("numeroParcelas");
+            var valor = parseInt(numeroParcelas.value);
+
+            if (valor < 1) {
+                numeroParcelas.value = 1;
+            } else if (valor > 12) {
+                numeroParcelas.value = 12;
+            }
+        }
+
+        function calcular() {
+            var valorPago = document.getElementById("valorPago").value.trim();
+            var numeroParcelas = document.getElementById("numeroParcelas").value.trim();
+
+            if (valorPago === "" || numeroParcelas === "") {
+                alert("Por favor, preencha todos os campos antes de calcular.");
+                return;
+            }
+
+            valorPago = parseFloat(valorPago.replace(',', '.'));
+            numeroParcelas = parseInt(numeroParcelas);
+
+            if (isNaN(valorPago) || isNaN(numeroParcelas)) {
+                alert("Valores inválidos. Verifique os campos e tente novamente.");
+                return;
+            }
+
+            function toFixedUp(number, decimals) {
+            var factor = Math.pow(10, decimals);
+            return Math.ceil(number * factor) / factor;
+            }
+
+            var taxaMercadoPago = 1.07;
+            var taxaParcelamento;
+
+            switch (numeroParcelas) {
+                case 1:
+                    taxaParcelamento = 1.00;
+                    break;
+                case 2:
+                    taxaParcelamento = 1.076402;
+                    break;
+                case 3:
+                    taxaParcelamento = 1.092305;
+                    break;
+                case 4:
+                    taxaParcelamento = 1.108598;
+                    break;
+                case 5:
+                    taxaParcelamento = 1.1231;
+                    break;
+                case 6:
+                    taxaParcelamento = 1.136495;
+                    break;
+                case 7:
+                    taxaParcelamento = 1.147196;
+                    break;
+                case 8:
+                    taxaParcelamento = 1.162305;
+                    break;
+                case 9:
+                    taxaParcelamento = 1.1769;
+                    break;
+                case 10:
+                    taxaParcelamento = 1.186495;
+                    break;
+                case 11:
+                    taxaParcelamento = 1.201199;
+                    break;
+                case 12:
+                    taxaParcelamento = 1.216106;
+                    break;
+                default:
+                    break;
+            }
+
+            var cotacaowlc = 155;
+
+            console.log("Valor pago: ", valorPago);
+            console.log("Parcelas: ", numeroParcelas);
+            console.log("Taxa de parcelamento: ", taxaParcelamento);
+            console.log("--------------------------------------------------------");
+            var resultado1 = valorPago / taxaParcelamento;
+            console.log(valorPago, "/", taxaParcelamento, "(taxa de parcelamento)" , "=", resultado1);
+            resultado = resultado1 / taxaMercadoPago;
+            console.log(resultado1, "/", taxaMercadoPago, "(taxa Mercado Pago)", "=", resultado);
+            resultado = toFixedUp(resultado, 2);
+            resultado = resultado.toFixed(2);
+            console.log("Valor pago calculado com taxas e arredondado: ", resultado);
+            console.log("--------------------------------------------------------");
+            var valorFinal = resultado * 155;
+            console.log(resultado, "*", cotacaowlc, "=", valorFinal);
+            valorFinal = Math.ceil(valorFinal);
+            console.log("Valor total a ser pago arredondado pra cima: ", valorFinal);
+
+            document.getElementById("textoResultado").textContent = "Valor recebido R$ " + resultado;
+            document.getElementById("textoResultado").style.display = "block";
+
+            document.getElementById("resultado").innerHTML = '<span style="color: black;">CLP </span><span style="color: #008000;">' + valorFinal.toLocaleString('pt-BR') + '</span>';
+
+            document.getElementById("copyInfo").style.display = "block";
+            document.getElementById("calcularBtn").disabled = true;
+            document.getElementById("novaCalculoBtn").style.display = "block";
+
+            document.getElementById("valorPago").disabled = true;
+            document.getElementById("numeroParcelas").disabled = true;
+        }
+
+        function novaConversao() {
+            document.getElementById("valorPago").value = "";
+            document.getElementById("numeroParcelas").value = "";
+            document.getElementById("resultado").textContent = "";
+            document.getElementById("textoResultado").style.display = "none";
+            document.getElementById("copyInfo").style.display = "none";
+            document.getElementById("calcularBtn").disabled = false;
+            document.getElementById("novaCalculoBtn").style.display = "none";
+
+            document.getElementById("valorPago").disabled = false;
+            document.getElementById("numeroParcelas").disabled = false;
+        }
+
+        function copiarValor() {
+            var valorFinal = document.getElementById("resultado").textContent.replace(/[^\d,]/g, '');
+            var tempInput = document.createElement("input");
+            tempInput.value = valorFinal;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+        }
+
+        document.getElementById("valorPago").addEventListener("keydown", function(event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                calcular();
+            }
+        });
+
+        document.getElementById("numeroParcelas").addEventListener("keydown", function(event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                calcular();
+            }
+        });
+    </script>
+</body>
+</html>

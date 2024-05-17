@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora cobrança Mercado Pago</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #e86850; /* Vermelho claro */
+        }
+        .container {
+            text-align: center;
+            padding: 50px;
+            background-color: #FFFFFF; /* Branco */
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 600px; /* Aumento da largura */
+        }
+        input[type="number"], input[type="text"] {
+            padding: 10px;
+            margin-bottom: 20px;
+            width: calc(100% - 22px); /* Ajuste para manter o mesmo tamanho */
+            text-align: center;
+            border: 1px solid #FF6666; /* Vermelho mais escuro */
+            border-radius: 8px;
+            font-size: 16px; /* Aumento do tamanho da fonte */
+            color: #000000; /* Preto */
+        }
+        button {
+            padding: 12px 24px;
+            background-color: #FF6666; /* Vermelho mais escuro */
+            color: #000000; /* Preto */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 16px; /* Aumento do tamanho da fonte */
+            display: block;
+            margin: 0 auto; /* Centraliza horizontalmente */
+        }
+        button:disabled {
+            background-color: #CCCCCC; /* Cinza claro */
+            cursor: not-allowed;
+            margin-bottom: 30px; /* Margem abaixo do botão */
+        }
+        #calcular {
+            margin-bottom: 10px; /* Margem abaixo do botão */
+        }
+        #novaCalculoBtn {
+            margin-top: 30px; /* Margem acima do botão */
+            margin-bottom: 20px; /* Margem abaixo do botão */
+        }
+        p {
+            color: #000000; /* Preto */
+            font-size: 14px; /* Aumento do tamanho da fonte */
+            margin-right: 10px;
+            margin-left: 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        #valorACobrar {
+            font-size: 30px; /* Aumento do tamanho da fonte para o resultado */
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            cursor: pointer; /* Torna o valor clicável */
+        }
+        #valorACobrar:hover {
+            text-decoration: underline; /* Adiciona sublinhado ao passar o mouse */
+            text-decoration-color: black; /* Define a cor da linha sublinhada */
+        }
+        h2 {
+            font-size: 20px; /* Aumento do tamanho da fonte para o título */
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .copy-info {
+            font-size: 12px;
+            color: #666666; /* Cinza */
+            display: none; /* Inicialmente oculto */
+        }
+        #textoResultado {
+            font-size: 14px;
+            color: #666666; /* Cinza */
+            display: none; /* Inicialmente oculto */
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Cobrança Mercado Pago</h2>
+        <input type="text" id="valorCobradoPesos" placeholder="Total a cobrar em CLP" maxlength="20" style="width: 200px" oninput="validarValor()">
+        <button onclick="calcular()" id="calcularBtn">Calcular</button>
+        <!-- Parágrafo para exibir o texto "Valor recebido CLP [valorCobradoPesos]" -->
+        <p id="textoResultado" style="display: none;"></p>
+        <!-- Parágrafo para exibir o valor final -->
+        <p id="valorACobrar" onclick="copiarValor()" style="cursor: pointer;"></p>
+        <p class="copy-info" id="copyInfo" style="display: none;">Clique no valor para copiá-lo para a área de transferência e depois colar diretamente no receptivo (Reservame).</p>
+        <!-- Botão para novo cálculo -->
+        <button onclick="novoCalculo()" id="novaCalculoBtn" style="display: none;">Novo Cálculo</button>
+    </div>
+
+    <script>
+        function validarValor() {
+            // Obter o elemento input
+            var inputElement = document.getElementById("valorCobradoPesos");
+
+            // Obter o valor atual do input
+            var valor = inputElement.value;
+
+            // Remove todos os caracteres que não são números
+            valor = valor.replace(/[^\d]/g, '');
+
+            // Atualizar o valor do input com o valor validado
+            inputElement.value = valor;
+        }
+
+        function calcular() {
+            var valorCobradoPesos = document.getElementById("valorCobradoPesos").value.trim();
+
+            // Verifica se os campos estão vazios
+            if (valorCobradoPesos === "") {
+                alert("Por favor, preencha todos os campos antes de calcular.");
+                return;
+            }
+
+            function toFixedUp(number, decimals) {
+                var factor = Math.pow(10, decimals);
+                return Math.ceil(number * factor) / factor;
+            }
+
+            valorCobradoPesos = parseFloat(valorCobradoPesos);
+
+            var cotacaowlc = 155;
+            var taxaMercadoPago = 1.07;
+
+            console.log("Valor total a cobrar em pesos: ", valorCobradoPesos);
+            console.log("---------------------------------");
+            var resultado = (valorCobradoPesos / cotacaowlc);
+            console.log(valorCobradoPesos, "/", cotacaowlc, "=", resultado);
+            resultado = toFixedUp(resultado, 2);
+            resultado = resultado.toFixed(2);
+            console.log("Valor cobrado em reais arredondado pra cima: ", resultado);
+            console.log("---------------------------------");
+            var valorACobrar = resultado * taxaMercadoPago;
+            console.log(resultado, "*", taxaMercadoPago, "=", valorACobrar);
+            valorACobrar = valorACobrar.toFixed(2);
+            console.log("Valor a cobrar arredondado", valorACobrar);     
+
+            // Formatação do resultado para exibir apenas duas casas decimais e substituir o ponto por vírgula
+            var valorACobrarFormatado = valorACobrar.replace('.', ',');
+
+            // Exibir o texto "A We Love Chile receberá R$ [resultado]"
+            document.getElementById("textoResultado").textContent = "A We Love Chile receberá R$ " + resultado.toString().replace('.', ',');
+            document.getElementById("textoResultado").style.display = "block";
+
+            // Exibir o valor a cobrar com a formatação desejada
+            document.getElementById("valorACobrar").innerHTML = '<span style="color: black;">Valor a ser pago no MP R$ </span><span style="color: #008000;">' + valorACobrarFormatado + '</span>';
+
+            // Exibir informações de cópia
+            document.getElementById("copyInfo").style.display = "block";
+
+            // Habilitar botão de novo cálculo
+            document.getElementById("calcularBtn").disabled = true;
+            document.getElementById("novaCalculoBtn").style.display = "block";
+
+            // Desativar campos de input
+            document.getElementById("valorCobradoPesos").disabled = true;
+        }
+
+        function novoCalculo() {
+            // Limpar valores e reativar campos e botão
+            document.getElementById("valorCobradoPesos").value = "";
+            document.getElementById("valorACobrar").textContent = "";
+            document.getElementById("textoResultado").style.display = "none";
+            document.getElementById("copyInfo").style.display = "none";
+            document.getElementById("calcularBtn").disabled = false;
+            document.getElementById("novaCalculoBtn").style.display = "none";
+
+            document.getElementById("valorCobradoPesos").disabled = false;
+        }
+
+        function copiarValor() {
+            var resultado = document.getElementById("valorACobrar").textContent.replace(/[^\d.,]/g, ''); // Apenas números, vírgulas e pontos
+            var tempInput = document.createElement("input");
+            tempInput.value = resultado;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+        }
+
+        // Adiciona um ouvinte de evento para o pressionamento da tecla "Enter"
+        document.getElementById("valorCobradoPesos").addEventListener("keydown", function(event) {
+            // Verifica se a tecla pressionada é "Enter" (código 13)
+            if (event.keyCode === 13) {
+                // Chama a função calcular()
+                calcular();
+            }
+        });
+    </script>
+</body>
+</html>
